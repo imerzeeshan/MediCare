@@ -3,6 +3,7 @@ const cors = require("cors");
 const authRoutes = require("./Middleware/auth.js");
 const medicationRoutes = require("./Routes/medications.js");
 const userRoutes = require("./Routes/users.routes.js");
+require("dotenv").config();
 // const bodyParser = require("body-parser");
 
 const app = express();

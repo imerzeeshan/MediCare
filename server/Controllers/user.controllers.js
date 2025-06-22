@@ -1,16 +1,15 @@
 const bcrypt = require("bcryptjs");
 const db = require("../db");
+const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
   const { username, password, role } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  console.log(username, password, role);
 
   db.run(
     "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
     [username, hashedPassword, role || "user"],
     function (err) {
-      console.log(err);
       if (err) {
         return res
           .status(400)
@@ -37,10 +36,23 @@ const login = async (req, res) => {
       if (!isValid)
         return res.status(401).json({ error: "Invalid username or password" });
 
-      res.json({
-        message: "Login successful",
-        user: { id: user.id, username: user.username, role: user.role },
+      const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
       });
+
+      const options = {
+        httpOnly: true,
+        secure: true,
+      };
+
+      res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .json({
+          message: "Login successful",
+          user: { id: user.id, username: user.username, role: user.role },
+          accessToken,
+        });
     }
   );
 };
