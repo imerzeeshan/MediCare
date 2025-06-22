@@ -1,4 +1,3 @@
-import React from "react";
 import PatientCard from "../components/PatientCard";
 import CaretakerCard from "../components/CaretakerCard";
 
